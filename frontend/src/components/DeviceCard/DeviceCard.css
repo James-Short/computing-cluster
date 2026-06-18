@@ -1,0 +1,15 @@
+
+.device-card{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 130px;
+    height: 12%;
+    aspect-ratio: 2.5/1;
+    border-radius: 15px;
+    background-color: rgb(215, 215, 215);
+}
+
+.device-card h1 h3{
+    margin: 0;
+}
