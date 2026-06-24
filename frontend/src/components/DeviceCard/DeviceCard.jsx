@@ -1,11 +1,11 @@
 import './DeviceCard.css';
 
-function DeviceCard({ ip, busy }){
+function DeviceCard({ ip, busy, onClick }){
     return(
-        <div className="device-card">
+        <button className="device-card" onClick={onClick}>
             <h1>{ip}</h1>
             <h3>{busy ? 'Busy' : 'Open'}</h3>
-        </div>
+        </button>
     )
 }
 

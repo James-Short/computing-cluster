@@ -1,5 +1,5 @@
 import { WebSocketServer } from 'ws';
-import { setAdminSocket, adminRouter } from './sockets/admin.js';
+import { setAdminSocket, adminRouter, removeDevice } from './sockets/admin.js';
 import { workerRouter, joinCluster } from './sockets/worker.js';
 
 const wss = new WebSocketServer({ port: 8080 });
@@ -22,4 +22,13 @@ wss.on('connection', (ws, req) => {
         else
             workerRouter(ws, data, reqIP);
     });
+
+    ws.on('close', () => {
+        console.log('device disconnected', isAdmin)
+        if(isAdmin){
+            setAdminSocket(undefined);
+        }
+        else
+            removeDevice(ws)
+    })
 })
