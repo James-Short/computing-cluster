@@ -2,33 +2,31 @@ import './App.css'
 
 import { useEffect, useRef, useState } from 'react';
 import DeviceCard from './components/DeviceCard/DeviceCard';
+import { adminHandler } from './handler/admin';
+import { workerHandler } from './handler/worker';
+
 
 function App() {
   const ws = useRef(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const isAdmin = useRef(false);
   const [devices, setDevices] = useState([]);
+  const devicesRef = useRef(devices);
+
+  useEffect(() => { devicesRef.current = devices; }, [devices]);
 
   useEffect(() => {
     ws.current = new WebSocket(`ws://${window.location.hostname}:8080`);
+    if(window.location.hostname == 'localhost'){
+      isAdmin.current = true;
+    }
     ws.current.onmessage = (message) => {
       const data = JSON.parse(message.data);
-      console.log(data)
-      if(data.type == 'connected'){
-        if(data.isAdmin == true){
-          setIsAdmin(true);
-        }
+      if(isAdmin.current){
+        adminHandler(data, devicesRef, setDevices);
       }
-      else if(data.type == 'update'){
-        if(data.target == 'all'){
-          console.log('1')
-          setDevices(data.data);
-        }
-        else if(data.target === 'new'){
-          console.log('2')
-          setDevices(prev => [...prev, data.data])
-        }
+      else{
+        workerHandler(data);
       }
-      console.log(data.type, data.target)
     }
 
     ws.current.onopen = () => {
