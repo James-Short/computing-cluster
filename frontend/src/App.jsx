@@ -22,10 +22,10 @@ function App() {
     ws.current.onmessage = (message) => {
       const data = JSON.parse(message.data);
       if(isAdmin.current){
-        adminHandler(data, devicesRef, setDevices);
+        adminHandler(data, devicesRef, setDevices, sendMessage);
       }
       else{
-        workerHandler(data);
+        workerHandler(data, sendMessage);
       }
     }
 
@@ -36,8 +36,12 @@ function App() {
 
   }, [])
 
+  function sendMessage(message){
+    ws.current.send(JSON.stringify(message));
+  }
+
   function sendTask(ip){
-    ws.current.send(JSON.stringify({ type: "task", action: "assign", targetIP: ip, task: 'stuff' }));
+    ws.current.send(JSON.stringify({ type: "task", action: "assign", targetIP: ip, task: 'return 2 + 2 + 2;' }));
   }
 
   return(
