@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import DeviceCard from './components/DeviceCard/DeviceCard';
 import { adminHandler } from './handler/admin';
 import { workerHandler } from './handler/worker';
+import DeviceMenu from './components/DeviceMenu/DeviceMenu';
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
   }, [])
 
   function sendMessage(message){
+    console.log('reached send message', message);
     ws.current.send(JSON.stringify(message));
   }
 
@@ -49,6 +51,7 @@ function App() {
       {devices.map(({ip, status}, index) => (
         <DeviceCard key={index} ip={ip} busy={false} onClick={() => sendTask(ip)}/>
       ))}
+      <DeviceMenu/>
     </>
   );
 }

@@ -7,7 +7,12 @@
     height: 12%;
     aspect-ratio: 2.5/1;
     border-radius: 15px;
-    background-color: rgb(215, 215, 215);
+    border: none;
+    background-color: white;
+}
+
+.device-card:hover{
+    cursor: pointer;
 }
 
 .device-card h1 h3{
