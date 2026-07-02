@@ -1,0 +1,67 @@
+
+.device-cancel-menu-container{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 1000;
+}
+
+.device-cancel-menu{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 10%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 25%;
+    width: 25%;
+    border-radius: 15px;
+    border: 2px solid white;
+    backdrop-filter: blur(25px);
+    overflow: hidden;
+}
+
+.device-cancel-menu-close-button{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 12%;
+    aspect-ratio: 1/1;
+    border-radius: 5px;
+    border: none;
+    background-color: tomato;
+    color: white;
+}
+
+.device-cancel-menu-close-button:hover{
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.device-cancel-menu-header{
+    color: white;
+    margin: 0;
+}
+
+.device-cancel-menu-confirmation{
+    color: white;
+    margin: 0;
+    font-size: 130%;
+}
+
+.device-cancel-menu-button{
+    margin: 0;
+    width: 15%;
+    aspect-ratio: 2/1;
+    border-radius: 10px;
+    border: none;
+    background-color: white;
+}
+
+.device-cancel-menu-button:hover{
+    cursor: pointer;
+    opacity: 0.95;
+}

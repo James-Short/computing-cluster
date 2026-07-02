@@ -1,0 +1,49 @@
+
+.device-complete-menu-container{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 1000;
+}
+
+.device-complete-menu{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 10%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 65%;
+    width: 65%;
+    border-radius: 15px;
+    border: 2px solid white;
+    backdrop-filter: blur(25px);
+    overflow: hidden;
+}
+
+.device-complete-menu-header{
+    color: white;
+    margin: 0;
+}
+
+.device-complete-menu-result-header{
+    color: white;
+    font-size: 150%;
+    margin: 0;
+}
+
+.device-complete-menu-result{
+    height: 45%;
+    width: 60%;
+    border: 1px solid white;
+    color: white;
+    margin: 0;
+}
+
+.device-complete-menu-button{
+    width: 8%;
+    aspect-ratio: 2.5/1;
+}

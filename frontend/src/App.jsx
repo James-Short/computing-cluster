@@ -5,12 +5,15 @@ import DeviceCard from './components/DeviceCard/DeviceCard';
 import { adminHandler } from './handler/admin';
 import { workerHandler } from './handler/worker';
 import DeviceMenu from './components/DeviceMenu/DeviceMenu';
+import DeviceCancelMenu from './components/DeviceCancelMenu/DeviceCancelMenu';
+import DeviceCompleteMenu from './components/DeviceCompleteMenu/DeviceCompleteMenu';
 
 
 function App() {
   const ws = useRef(null);
   const isAdmin = useRef(false);
   const [devices, setDevices] = useState([]);
+  const [menuVisible, setMenuVisible] = useState(false);
   const devicesRef = useRef(devices);
 
   useEffect(() => { devicesRef.current = devices; }, [devices]);
@@ -51,7 +54,8 @@ function App() {
       {devices.map(({ip, status}, index) => (
         <DeviceCard key={index} ip={ip} busy={false} onClick={() => sendTask(ip)}/>
       ))}
-      <DeviceMenu/>
+      {menuVisible ? <DeviceMenu setMenuVisible={setMenuVisible}/> : <></>}
+      <DeviceCompleteMenu/>
     </>
   );
 }

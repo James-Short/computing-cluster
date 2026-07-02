@@ -1,4 +1,11 @@
 
+.device-menu-container{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 1000;
+}
+
 .device-menu{
     display: flex;
     flex-direction: column;
@@ -66,4 +73,8 @@
     height: 5%;
     aspect-ratio: 3/1;
     border-radius: 5px;
+}
+
+.device-menu-task-assign-button:hover{
+    cursor: pointer;
 }
