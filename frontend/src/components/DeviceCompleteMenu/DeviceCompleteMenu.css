@@ -1,9 +1,12 @@
 
 .device-complete-menu-container{
     position: absolute;
+    top: 0;
+    left: 0;
     height: 100%;
     width: 100%;
     z-index: 1000;
+    backdrop-filter: blur(5px);
 }
 
 .device-complete-menu{
@@ -20,8 +23,25 @@
     width: 65%;
     border-radius: 15px;
     border: 2px solid white;
-    backdrop-filter: blur(25px);
+    backdrop-filter: blur(5px);
     overflow: hidden;
+}
+
+.device-complete-menu-close-button{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 5%;
+    aspect-ratio: 1/1;
+    border-radius: 5px;
+    border: none;
+    background-color: tomato;
+    color: white;
+}
+
+.device-complete-menu-close-button:hover{
+    cursor: pointer;
+    opacity: 0.8;
 }
 
 .device-complete-menu-header{

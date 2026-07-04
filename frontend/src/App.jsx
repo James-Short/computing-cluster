@@ -12,8 +12,10 @@ import DeviceCompleteMenu from './components/DeviceCompleteMenu/DeviceCompleteMe
 function App() {
   const ws = useRef(null);
   const isAdmin = useRef(false);
-  const [devices, setDevices] = useState([]);
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [devices, setDevices] = useState([{ ip: "192.168.1.161", status: "open" }]);
+  const [deviceMenuVisible, setDeviceMenuVisible] = useState(false);
+  const [cancelMenuVisible, setCancelMenuVisible] = useState(false);
+  const [completeMenuVisible, setCompleteMenuVisible] = useState(false);
   const devicesRef = useRef(devices);
 
   useEffect(() => { devicesRef.current = devices; }, [devices]);
@@ -52,10 +54,11 @@ function App() {
   return(
     <>
       {devices.map(({ip, status}, index) => (
-        <DeviceCard key={index} ip={ip} busy={false} onClick={() => sendTask(ip)}/>
+        <DeviceCard key={index} ip={ip} status={status} onClick={() => (status == "open") ? setDeviceMenuVisible(true) : (status == "busy") ? setCancelMenuVisible(true) : setCompleteMenuVisible(true)}/>
       ))}
-      {menuVisible ? <DeviceMenu setMenuVisible={setMenuVisible}/> : <></>}
-      <DeviceCompleteMenu/>
+      {deviceMenuVisible ? <DeviceMenu setVisibility={setDeviceMenuVisible} sendMessage={sendMessage}/> : <></>}
+      {completeMenuVisible ? <DeviceCompleteMenu setVisibility={setCompleteMenuVisible} sendMessage={sendMessage}/> : <></>}
+      {cancelMenuVisible ? <DeviceCancelMenu setVisibility={setCancelMenuVisible} sendMessage={sendMessage}/> : <></>}
     </>
   );
 }

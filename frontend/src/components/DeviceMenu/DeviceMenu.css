@@ -1,9 +1,12 @@
 
 .device-menu-container{
     position: absolute;
+    left: 0;
+    top: 0;
     height: 100%;
     width: 100%;
     z-index: 1000;
+    backdrop-filter: blur(5px);
 }
 
 .device-menu{
@@ -20,7 +23,7 @@
     width: 85%;
     border-radius: 15px;
     border: 2px solid white;
-    backdrop-filter: blur(25px);
+    backdrop-filter: blur(5px);
     overflow: hidden;
 }
 
