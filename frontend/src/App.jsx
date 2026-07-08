@@ -16,6 +16,7 @@ function App() {
   const [deviceMenuVisible, setDeviceMenuVisible] = useState(false);
   const [cancelMenuVisible, setCancelMenuVisible] = useState(false);
   const [completeMenuVisible, setCompleteMenuVisible] = useState(false);
+  const [curIP, setCurIP] = useState("");
   const devicesRef = useRef(devices);
 
   useEffect(() => { devicesRef.current = devices; }, [devices]);
@@ -54,11 +55,11 @@ function App() {
   return(
     <>
       {devices.map(({ip, status}, index) => (
-        <DeviceCard key={index} ip={ip} status={status} onClick={() => (status == "open") ? setDeviceMenuVisible(true) : (status == "busy") ? setCancelMenuVisible(true) : setCompleteMenuVisible(true)}/>
+        <DeviceCard key={index} ip={ip} status={status} onClick={() => { setCurIP(ip); (status == "open") ? setDeviceMenuVisible(true) : (status == "busy") ? setCancelMenuVisible(true) : setCompleteMenuVisible(true); }}/>
       ))}
-      {deviceMenuVisible ? <DeviceMenu setVisibility={setDeviceMenuVisible} sendMessage={sendMessage}/> : <></>}
-      {completeMenuVisible ? <DeviceCompleteMenu setVisibility={setCompleteMenuVisible} sendMessage={sendMessage}/> : <></>}
-      {cancelMenuVisible ? <DeviceCancelMenu setVisibility={setCancelMenuVisible} sendMessage={sendMessage}/> : <></>}
+      {deviceMenuVisible ? <DeviceMenu setVisibility={setDeviceMenuVisible} sendMessage={sendMessage} deviceIP={curIP}/> : <></>}
+      {completeMenuVisible ? <DeviceCompleteMenu setVisibility={setCompleteMenuVisible} sendMessage={sendMessage} deviceIP={curIP}/> : <></>}
+      {cancelMenuVisible ? <DeviceCancelMenu setVisibility={setCancelMenuVisible} sendMessage={sendMessage} deviceIP={curIP}/> : <></>}
     </>
   );
 }
