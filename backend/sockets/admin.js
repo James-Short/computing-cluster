@@ -12,7 +12,8 @@ export function adminRouter(ws, message){
     }
     else if(message.type == 'task'){
         if(message.action == 'assign'){
-            assignTask(ws, message.targetIP, message.task);
+            console.log("Got this 1: ", message)
+            assignTask(ws, message.target, message.task);
         }
     }
 }
@@ -30,7 +31,6 @@ export function messageAdmin(message){
     if(adminSocket)
         adminSocket.send(JSON.stringify(message));
 }
-
 
 function getDevices(ws){
     const returnDevices = [];
@@ -72,14 +72,27 @@ export function updateStatus(deviceSocket, curStatus){
 }
 
 export function sendResult(deviceSocket, result){
-    ws.send(JSON.stringify({ type: "update", target: device}))
+    let deviceIP;
+    let deviceIndex = 0;
+    while(deviceIndex < devices.length){
+        if(devices[deviceIndex].socket === deviceSocket){
+            deviceIP = devices[deviceIndex].ip;
+            break;
+        }
+        deviceIndex++;
+    }
+    if(deviceIP){
+        messageAdmin({ type: "update", target: deviceIP, status: "complete", data: result });
+    }
+
+    
 }
 
 function assignTask(ws, targetIP, task){
+    console.log("Got this: ", targetIP)
     let targetSocket = undefined;
     let device;
     devices.forEach((device) => {
-        console.log(device.ip, targetIP)
         if(device.ip === targetIP){
             targetSocket = device.socket;
         }
@@ -97,7 +110,6 @@ function cancelTask(ws, targetIP, task){
     let targetIsBusy = false;
     let device;
     devices.forEach((device) => {
-        console.log(device.ip, targetIP)
         if(device.ip === targetIP){
             targetSocket = device.socket;
             if(device.status === "busy"){

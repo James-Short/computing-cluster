@@ -5,7 +5,7 @@ function DeviceMenu({ setVisibility, sendMessage, deviceIP }){
     const [taskInput, setTaskInput] = useState("");
 
     function submitTask(){
-        sendMessage({ type: "task", action: "assign", target: deviceIP });
+        sendMessage({ type: "task", action: "assign", target: deviceIP, task: taskInput });
     }
 
     return(

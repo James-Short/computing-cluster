@@ -13,11 +13,8 @@ export function workerHandler(data, sendMessage){
             sendMessage({ type: "task", status: "active" });
             
             ww.onmessage = (e) => {
-                if(e.data.type === 'result'){
-                    isBusy = false;
-                    sendMessage({ type: "task", status: "complete", data: e.data });
-                }
-                console.log(e.data)
+                isBusy = false;
+                sendMessage({ type: "task", status: "complete", data: e.data });
             }
 
         }
