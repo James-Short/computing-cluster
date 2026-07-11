@@ -6,6 +6,7 @@ function DeviceMenu({ setVisibility, sendMessage, deviceIP }){
 
     function submitTask(){
         sendMessage({ type: "task", action: "assign", target: deviceIP, task: taskInput });
+        setVisibility(false);
     }
 
     return(

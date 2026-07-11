@@ -17,6 +17,7 @@ function App() {
   const [cancelMenuVisible, setCancelMenuVisible] = useState(false);
   const [completeMenuVisible, setCompleteMenuVisible] = useState(false);
   const [curIP, setCurIP] = useState("");
+  const [curResult, setCurResult] = useState("");
   const devicesRef = useRef(devices);
 
   useEffect(() => { devicesRef.current = devices; }, [devices]);
@@ -52,13 +53,22 @@ function App() {
     ws.current.send(JSON.stringify({ type: "task", action: "assign", targetIP: ip, task: 'return 2 + 2 + 2;' }));
   }
 
+  function setDeviceOpen(deviceIP){
+    const currentDevices = devicesRef.current;
+    const index = currentDevices.findIndex(d => d.ip === deviceIP);
+    const updatedDevice = {...currentDevices[index], status: "open" }
+    const newDevices = [...currentDevices];
+    newDevices[index] = updatedDevice;
+    setDevices(newDevices)
+  }
+
   return(
     <>
-      {devices.map(({ip, status}, index) => (
-        <DeviceCard key={index} ip={ip} status={status} onClick={() => { setCurIP(ip); (status == "open") ? setDeviceMenuVisible(true) : (status == "busy") ? setCancelMenuVisible(true) : setCompleteMenuVisible(true); }}/>
+      {devices.map(({ip, status, result}, index) => (
+        <DeviceCard key={index} ip={ip} status={status} result={result} onClick={() => { setCurIP(ip); setCurResult(result); (status == "open") ? setDeviceMenuVisible(true) : (status == "busy") ? setCancelMenuVisible(true) : setCompleteMenuVisible(true); }}/>
       ))}
       {deviceMenuVisible ? <DeviceMenu setVisibility={setDeviceMenuVisible} sendMessage={sendMessage} deviceIP={curIP}/> : <></>}
-      {completeMenuVisible ? <DeviceCompleteMenu setVisibility={setCompleteMenuVisible} sendMessage={sendMessage} deviceIP={curIP}/> : <></>}
+      {completeMenuVisible ? <DeviceCompleteMenu setVisibility={setCompleteMenuVisible} sendMessage={sendMessage} deviceIP={curIP} result={curResult} setDeviceOpen={setDeviceOpen}/> : <></>}
       {cancelMenuVisible ? <DeviceCancelMenu setVisibility={setCancelMenuVisible} sendMessage={sendMessage} deviceIP={curIP}/> : <></>}
     </>
   );

@@ -17,7 +17,18 @@ export function adminHandler(data, devices, setDevices, sendMessage){
         else if(data.status === 'complete'){
             const currentDevices = devices.current;
             const index = currentDevices.findIndex(d => d.ip === data.target);
-            const updatedDevice = {...devices[index], status: "complete" }
+            const updatedDevice = {...currentDevices[index], status: "complete", result: data.data }
+            const newDevices = [...currentDevices];
+            newDevices[index] = updatedDevice;
+            setDevices(newDevices)
+        }
+        else if(data.status === "active"){
+            const currentDevices = devices.current;
+            const index = currentDevices.findIndex(d => d.ip === data.target);
+            const updatedDevice = {...currentDevices[index], status: "busy" }
+            const newDevices = [...currentDevices];
+            newDevices[index] = updatedDevice;
+            setDevices(newDevices)
         }
 
     }

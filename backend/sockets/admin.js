@@ -62,13 +62,16 @@ export function removeDevice(deviceSocket){
 
 export function updateStatus(deviceSocket, curStatus){
     let deviceIndex = 0;
+    let targetIP;
     while(deviceIndex < devices.length){
         if(devices[deviceIndex].socket === deviceSocket){
             devices[deviceIndex] = { ...devices[deviceIndex], status: curStatus };
+            targetIP = devices[deviceIndex].ip;
             return;
         }
         deviceIndex++;
     };
+    messageAdmin({ type: "update", target: targetIP, status: curStatus });
 }
 
 export function sendResult(deviceSocket, result){
