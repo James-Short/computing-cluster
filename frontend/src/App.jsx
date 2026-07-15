@@ -12,7 +12,7 @@ import DeviceCompleteMenu from './components/DeviceCompleteMenu/DeviceCompleteMe
 function App() {
   const ws = useRef(null);
   const isAdmin = useRef(false);
-  const [devices, setDevices] = useState([{ ip: "192.168.1.161", status: "open" }]);
+  const [devices, setDevices] = useState([]);
   const [deviceMenuVisible, setDeviceMenuVisible] = useState(false);
   const [cancelMenuVisible, setCancelMenuVisible] = useState(false);
   const [completeMenuVisible, setCompleteMenuVisible] = useState(false);
@@ -24,7 +24,7 @@ function App() {
 
   useEffect(() => {
     ws.current = new WebSocket(`ws://${window.location.hostname}:8080`);
-    if(window.location.hostname == 'localhost'){
+    if(window.location.hostname === 'localhost'){
       isAdmin.current = true;
     }
     ws.current.onmessage = (message) => {
@@ -65,13 +65,14 @@ function App() {
   return(
     <>
       {devices.map(({ip, status, result}, index) => (
-        <DeviceCard key={index} ip={ip} status={status} result={result} onClick={() => { setCurIP(ip); setCurResult(result); (status == "open") ? setDeviceMenuVisible(true) : (status == "busy") ? setCancelMenuVisible(true) : setCompleteMenuVisible(true); }}/>
+        <DeviceCard key={index} ip={ip} status={status} result={result} onClick={() => { setCurIP(ip); setCurResult(result); (status == "open") ? setDeviceMenuVisible(true) : (status == "busy") ? setCancelMenuVisible(true) : ( status == "complete" || status == "error") ? setCompleteMenuVisible(true): null;  }}/>
       ))}
       {deviceMenuVisible ? <DeviceMenu setVisibility={setDeviceMenuVisible} sendMessage={sendMessage} deviceIP={curIP}/> : <></>}
       {completeMenuVisible ? <DeviceCompleteMenu setVisibility={setCompleteMenuVisible} sendMessage={sendMessage} deviceIP={curIP} result={curResult} setDeviceOpen={setDeviceOpen}/> : <></>}
       {cancelMenuVisible ? <DeviceCancelMenu setVisibility={setCancelMenuVisible} sendMessage={sendMessage} deviceIP={curIP}/> : <></>}
     </>
-  );
+    );
+  
 }
 
 export default App;

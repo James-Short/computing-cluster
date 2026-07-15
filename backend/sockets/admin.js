@@ -1,35 +1,44 @@
 
 export const devices = []
 export let adminSocket = undefined;
+const messageQueue = [];
 
 
 export function adminRouter(ws, message){
-    console.log('reached admin router')
-    if(message.type == 'device'){
-        if(message.action == 'get'){
+    if(message.type === 'device'){
+        if(message.action === 'get'){
             getDevices(ws);
         }
     }
-    else if(message.type == 'task'){
-        if(message.action == 'assign'){
-            console.log("Got this 1: ", message)
+    else if(message.type === 'task'){
+        if(message.action === 'assign'){
             assignTask(ws, message.target, message.task);
+        }
+        if(message.action === 'cancel'){
+            cancelTask(ws, message.target)
         }
     }
 }
 
 export function setAdminSocket(value){
     adminSocket = value;
+    while(messageQueue.length > 0){
+        const message = messageQueue.pop();
+        messageAdmin(message, true);
+    }
 }
 
 export function getAdminSocket(){
     return adminSocket;
 }
 
-export function messageAdmin(message){
-    console.log('reached messageAdmin')
-    if(adminSocket)
+export function messageAdmin(message, queueIfNeeded=false){
+    if(adminSocket){
         adminSocket.send(JSON.stringify(message));
+    }
+    else if(queueIfNeeded){
+        messageQueue.push(message);
+    }
 }
 
 function getDevices(ws){
@@ -38,97 +47,84 @@ function getDevices(ws){
     for(device of devices){
         returnDevices.push({ ip: device.ip, status: device.status });
     }
-    ws.send(JSON.stringify({ type: 'update', target: 'all', data: returnDevices }))
+    messageAdmin({ type: 'update', target: 'all', data: returnDevices }, false);
 }
 
 export function addDevice(deviceSocket, deviceIP){
-    devices.push({ ip: deviceIP, status: 'open', socket: deviceSocket })
-    messageAdmin({ type: 'update', target: 'new', data: { ip: deviceIP, status: 'open' } });
+    if(devices.findIndex(d => d.ip === deviceIP) === -1){
+        devices.push({ ip: deviceIP, status: 'open', socket: deviceSocket });
+        messageAdmin({ type: 'update', target: 'new', data: { ip: deviceIP, status: 'open' } }, false);
+    }
+    else{
+        deviceSocket.send(JSON.stringify({ type: 'error', data: "This device's IP is already connected." }));
+    }
 }
 
 export function removeDevice(deviceSocket){
-    let removedIP;
-    let deviceIndex = 0;
-    while(deviceIndex < devices.length){
-        if(devices[deviceIndex].socket === deviceSocket){
-            removedIP = devices[deviceIndex].ip;
-            break;
-        }
-        deviceIndex++;
+    let deviceIndex = devices.findIndex(d => d.socket === deviceSocket);
+    if(deviceIndex != -1){
+        const removedIP = devices[deviceIndex];
+        devices.splice(deviceIndex, 1);
+        messageAdmin({ type: 'update', target: removedIP, action: 'remove' }, false);
     }
-    devices.splice(deviceIndex, 1);
-    messageAdmin({ type: 'update', target: removedIP, action: 'remove' });
 }
 
 export function updateStatus(deviceSocket, curStatus){
-    let deviceIndex = 0;
-    let targetIP;
-    while(deviceIndex < devices.length){
-        if(devices[deviceIndex].socket === deviceSocket){
-            devices[deviceIndex] = { ...devices[deviceIndex], status: curStatus };
-            targetIP = devices[deviceIndex].ip;
-            return;
-        }
-        deviceIndex++;
-    };
-    messageAdmin({ type: "update", target: targetIP, status: curStatus });
-}
-
-export function sendResult(deviceSocket, result){
-    let deviceIP;
-    let deviceIndex = 0;
-    while(deviceIndex < devices.length){
-        if(devices[deviceIndex].socket === deviceSocket){
-            deviceIP = devices[deviceIndex].ip;
-            break;
-        }
-        deviceIndex++;
-    }
-    if(deviceIP){
-        messageAdmin({ type: "update", target: deviceIP, status: "complete", data: result });
+    let deviceIndex = devices.findIndex(d => d.socket === deviceSocket);
+    if(deviceIndex != -1){
+        devices[deviceIndex] = { ...devices[deviceIndex], status: curStatus };
+        messageAdmin({ type: 'update', target: devices[deviceIndex].ip, status: curStatus }, false);
     }
 
     
 }
 
-function assignTask(ws, targetIP, task){
-    console.log("Got this: ", targetIP)
-    let targetSocket = undefined;
-    let device;
-    devices.forEach((device) => {
-        if(device.ip === targetIP){
-            targetSocket = device.socket;
+export function sendResult(deviceSocket, result, isError = false){
+    let deviceIndex = devices.findIndex(d => d.socket === deviceSocket);
+    if(deviceIndex != -1){
+        if(isError){
+            messageAdmin({ type: 'update', target: devices[deviceIndex].ip, status: 'error', data: result }, true);
         }
-    });
-    if(targetSocket){
-        targetSocket.send(JSON.stringify({ type: 'task', action: 'assign', task: task }));
-    }
-    else{
-        ws.send(JSON.stringify({ type: "error", data: "Target device was not found." }));
+        else{
+            messageAdmin({ type: 'update', target: devices[deviceIndex].ip, status: 'complete', data: result }, true);
+        }
     }
 }
 
-function cancelTask(ws, targetIP, task){
+function assignTask(ws, targetIP, task){
+    let deviceIndex = devices.findIndex(d => d.ip === targetIP);
+    if(deviceIndex != -1){
+        const targetSocket = devices[deviceIndex].socket;
+        targetSocket.send(JSON.stringify({ type: 'task', action: 'assign', task: task }));
+    }
+    else{
+        messageAdmin({ type: 'error', data: 'Target device was not found.' }, false);
+    }
+}
+
+function cancelTask(ws, targetIP){
+    let deviceIndex = devices.findIndex(d => d.socket === deviceSocket);
     let targetSocket = undefined;
     let targetIsBusy = false;
     let device;
     devices.forEach((device) => {
         if(device.ip === targetIP){
             targetSocket = device.socket;
-            if(device.status === "busy"){
+            if(device.status === 'active'){
                 targetIsBusy = true;
             }
         }
     });
-    if(targetSocket){
-        if(targetIsBusy){
+    if(deviceIndex != -1){
+        if(devices[deviceIndex].status === 'active'){
+            const targetSocket = devices[deviceIndex].socket;
             targetSocket.send(JSON.stringify({ type: 'task', action: 'cancel' }));
         }
         else{
-            ws.send(JSON.stringify({ type: "error", data: "Target device does not currently have a task to cancel." }));
+            messageAdmin({ type: 'error', data: 'Target device does not currently have a task to cancel.' }, false);
         }
     }
     else{
-        ws.send(JSON.stringify({ type: "error", data: "Target device not found" }));
+        messageAdmin({ type: 'error', data: 'Target device not found' }, false);
     }
 }

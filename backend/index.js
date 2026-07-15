@@ -6,7 +6,7 @@ const wss = new WebSocketServer({ port: 8080 });
 
 wss.on('connection', (ws, req) => {
     const reqIP = req.socket.remoteAddress.replace(/^::ffff:/, '');
-    const isAdmin = reqIP == '127.0.0.1' || reqIP == "::1";
+    const isAdmin = reqIP === '127.0.0.1' || reqIP === '::1';
 
     if(isAdmin)
         setAdminSocket(ws);
@@ -28,7 +28,8 @@ wss.on('connection', (ws, req) => {
         if(isAdmin){
             setAdminSocket(undefined);
         }
-        else
+        else{
             removeDevice(ws)
+        }
     })
 })

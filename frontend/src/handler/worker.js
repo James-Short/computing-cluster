@@ -1,8 +1,9 @@
+let ww;
+let isBusy = false;
 
 export function workerHandler(data, sendMessage){
     console.log('worker: ', data)
-    let ww;
-    let isBusy = false;
+    
     if(data.type === 'task'){
         if(data.action === 'assign'){
             sendMessage({ type: 'task', status: 'accepted' });
@@ -16,16 +17,21 @@ export function workerHandler(data, sendMessage){
                 isBusy = false;
                 sendMessage({ type: "task", status: "complete", data: e.data });
             }
+            ww.onerror = (error) => {
+                isBusy = false;
+                sendMessage({ type: "task", status: "error", data: error.message });
+            }
 
         }
         if(data.action === 'cancel'){
+            console.log("Isbusy: ", isBusy);
             if(isBusy){
                 ww.terminate();
                 isBusy = false;
                 sendMessage({ type: "task", status: "cancelled" });
             }
             else{
-                sendMessage({ type: error, data: "Target device does not currently have a task to cancel." });
+                sendMessage({ type: "error", data: "Target device does not currently have a task to cancel." });
             }
         }
     }
